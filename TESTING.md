@@ -13,7 +13,7 @@ Prerequisites
 - A local Vintage Story install for runtime testing (only required for running the game; not required to compile with STUBS).
 
 Scripts you will use
-- `scripts\make-test-zip-and-install.ps1`
+- `scripts\test.ps1`
 	- Builds Release, packages the mod, and copies the produced zip into your local Mods folder for testing.
 	- Usage (default):
 
@@ -24,22 +24,22 @@ Scripts you will use
 	- If you want packaging to use your install's API DLLs, pass `-GamePath`:
 
 ```powershell
-.\scripts\make-test-zip-and-install.ps1 -GamePath 'C:\Path\To\VintageStory'
+.\scripts\test.ps1 -GamePath 'C:\Path\To\VintageStory'
 ```
 
-- `scripts\bump-version-and-release.ps1`
+- `scripts\release.ps1`
 	- Bumps `modinfo.json` semver (supports `patch`, `minor`, `major`), builds and packages a release zip into `dist/`.
 	- Usage (patch bump):
 
 ```powershell
-.\scripts\bump-version-and-release.ps1 -Part patch
+.\scripts\release.ps1 -Part patch
 ```
 
 Quick singleplayer test (fast)
 1. From repo root run:
 
 ```powershell
-.\scripts\make-test-zip-and-install.ps1
+.\scripts\test.ps1
 ```
 
 2. Start Vintage Story.
@@ -93,3 +93,4 @@ Notes
 - CI was intentionally removed to keep the workflow local-only. The `STUBS` conditional compilation is still available in code if you later want CI builds that do not require the game DLLs.
 
 If you want, I can add a single one-page `scripts/README.md` with these quick commands — say the word and I'll add it.
+

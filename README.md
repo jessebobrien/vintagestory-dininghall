@@ -21,8 +21,8 @@ Copy-Item -Path .\modinfo.json -Destination $mods -Force
 
 3) Optional: use the helper scripts added in `scripts/`:
 
-- `scripts\make-test-zip-and-install.ps1` — builds, packages, and copies the produced zip to your local Mods folder for quick testing.
-- `scripts\bump-version-and-release.ps1` — bump semver in `modinfo.json` (patch/minor/major), build and produce a release zip in `dist/`.
+- `scripts\test.ps1` — builds, packages, and copies the produced zip to your local Mods folder for quick testing.
+- `scripts\release.ps1` — bump semver in `modinfo.json` (patch/minor/major), build and produce a release zip in `dist/`.
 
 Examples:
 
@@ -39,4 +39,5 @@ Minimal test
 - Start the game after installing the DLL and stand near a table in an enclosed room. Look for chat messages with `[DiningHall DEBUG] Room value: X`.
 
 If you want me to remove other helper scripts and keep only these two, I already removed older helpers; let me know if you want any additional cleanup.
+
 
