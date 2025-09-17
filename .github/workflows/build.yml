@@ -27,3 +27,14 @@ jobs:
       with:
         name: DiningHallMod-dll
         path: bin/Release/net472/DiningHallMod.dll
+
+    - name: Package mod (PowerShell)
+      shell: pwsh
+      run: |
+        .\package.ps1
+
+    - name: Upload packaged mod zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: DiningHall-zip
+        path: dist/*.zip
