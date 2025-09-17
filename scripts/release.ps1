@@ -69,4 +69,9 @@ Compress-Archive -Path $files -DestinationPath $zipPath
 
 if (-not (Test-Path $zipPath)) { throw "Package zip not found at $zipPath" }
 Write-Host "Created release zip: $zipPath"
+# Copy release zip into user's Mods folder (place zip directly in Mods)
+$modsDest = Join-Path $env:APPDATA 'VintagestoryData\Mods'
+New-Item -ItemType Directory -Force -Path $modsDest | Out-Null
+Copy-Item $zipPath -Destination $modsDest -Force
+Write-Host "Copied $zipName to $modsDest"
 Write-Host 'Done.'
