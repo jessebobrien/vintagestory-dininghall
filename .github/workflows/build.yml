@@ -19,8 +19,8 @@ jobs:
       with:
         dotnet-version: '6.0.x'
 
-    - name: Restore & Build (Release)
-      run: dotnet build DiningHallMod.csproj -c Release
+    - name: Restore & Build (Release) using STUBS
+      run: dotnet build DiningHallMod.csproj -c Release /p:DefineConstants=STUBS
 
     - name: Upload DLL
       uses: actions/upload-artifact@v4
