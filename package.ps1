@@ -48,20 +48,42 @@ $modinfo = Get-Content .\modinfo.json -Raw | ConvertFrom-Json
 $name = $modinfo.name
 $version = $modinfo.version
 
-# Generate placeholder modicon.png if missing
-$iconPath = Join-Path $PSScriptRoot 'modicon.png'
-if (-not (Test-Path $iconPath)) {
-    Write-Host "Generating placeholder modicon.png..."
-    Add-Type -AssemblyName System.Drawing
-    $bmp = New-Object System.Drawing.Bitmap 64,64
-    $g = [System.Drawing.Graphics]::FromImage($bmp)
-    $g.Clear([System.Drawing.Color]::FromArgb(255,200,200,200))
-    $font = New-Object System.Drawing.Font 'Arial',24,[System.Drawing.FontStyle]::Bold
-    $brush = [System.Drawing.Brushes]::DarkSlateGray
-    $g.DrawString('DH',$font,[System.Drawing.Brushes]::Black,8,16)
-    $bmp.Save($iconPath,[System.Drawing.Imaging.ImageFormat]::Png)
-    $g.Dispose(); $bmp.Dispose()
-}
+ # Generate placeholder modicon.png if missing
+ $iconPath = Join-Path $PSScriptRoot 'modicon.png'
+ if (-not (Test-Path $iconPath)) {
+     Write-Host "Generating placeholder modicon.png..."
+     Add-Type -AssemblyName System.Drawing
+     $bmp = New-Object System.Drawing.Bitmap 64,64
+     $g = [System.Drawing.Graphics]::FromImage($bmp)
+     try {
+         # simple background
+         $g.Clear([System.Drawing.Color]::FromArgb(255,200,200,200))
+
+         # Draw a darker square inset
+         $rectBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255,120,120,120))
+         $g.FillRectangle($rectBrush, 8, 8, 48, 48)
+         $rectBrush.Dispose()
+
+         # Draw initials using two filled rectangles to avoid using Font constructors (which can be ambiguous on some platforms)
+         $letterBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255,255,255,255))
+         # 'D' approximated by a vertical bar and a right semicircle area made with rectangles
+         $g.FillRectangle($letterBrush, 14, 18, 4, 28) # vertical bar
+         $g.FillRectangle($letterBrush, 20, 18, 10, 6)
+         $g.FillRectangle($letterBrush, 20, 34, 10, 6)
+         $g.FillRectangle($letterBrush, 28, 24, 4, 16)
+
+         # 'H' approximated by two vertical bars and a connecting horizontal bar
+         $g.FillRectangle($letterBrush, 36, 18, 4, 28)
+         $g.FillRectangle($letterBrush, 48, 18, 4, 28)
+         $g.FillRectangle($letterBrush, 40, 30, 8, 4)
+         $letterBrush.Dispose()
+
+         $bmp.Save($iconPath,[System.Drawing.Imaging.ImageFormat]::Png)
+     }
+     finally {
+         $g.Dispose(); $bmp.Dispose()
+     }
+ }
 
 # Create deps json
 $deps = [PSCustomObject]@{
