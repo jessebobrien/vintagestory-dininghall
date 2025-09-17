@@ -48,3 +48,27 @@ Notes and assumptions:
 ## Minimal testing plan
 - Singleplayer: place a table inside a small enclosed room and stand inside; check chat for "[DiningHall DEBUG] Room value: X".
 - Multiplayer: connect multiple players to the same enclosed room and verify calculations (future: buff duration scaling by player count).
+
+## Packaging for distribution
+
+Distribution format (convention): `MODNAME_SEMVER.zip` containing:
+- `*.dll` (the compiled mod assembly)
+- `*.pdb` (optional debug symbols)
+- `modinfo.json` (required)
+- `modicon.png` (recommended)
+- `MODNAME.deps.json` (listing runtime dependencies and engine version)
+
+Use the provided `package.ps1` script to build and package the mod. Example:
+
+```powershell
+.\package.ps1
+```
+
+This will build the project (STUBS by default), generate a placeholder `modicon.png` if missing, create `MODNAME.deps.json`, and write `dist\MODNAME_VERSION.zip`.
+
+If you want to build against the real game DLLs during packaging, pass the `-GamePath` parameter:
+
+```powershell
+.\package.ps1 -GamePath 'C:\Path\To\VintageStory'
+```
+
