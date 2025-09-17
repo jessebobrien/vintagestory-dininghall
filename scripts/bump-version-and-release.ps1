@@ -40,13 +40,33 @@ $modinfo | ConvertTo-Json -Depth 4 | Set-Content -NoNewline $modinfoPath -Encodi
 Write-Host "Bumped version to $newVersion"
 
 # Build & package
-Write-Host "Building (Release) and packaging..."
+Write-Host "Building (Release)..."
 dotnet build .\DiningHallMod.csproj -c Release
-if ($GamePath) { .\package.ps1 -GamePath $GamePath } else { .\package.ps1 }
 
-$zipName = "$($modinfo.name)_$($modinfo.version).zip"
-$zipPath = Join-Path $repoRoot (Join-Path 'dist' $zipName)
+Write-Host "Packaging release zip..."
+$dist = Join-Path $repoRoot 'dist'
+New-Item -ItemType Directory -Force -Path $dist | Out-Null
+
+$dll = Join-Path $repoRoot 'bin\Release\net472\DiningHallMod.dll'
+$pdb = Join-Path $repoRoot 'bin\Release\net472\DiningHallMod.pdb'
+$icon = Join-Path $repoRoot 'modicon.png'
+
+if (-not (Test-Path $dll)) { throw "Built DLL not found at $dll" }
+
+if (-not (Test-Path $icon)) {
+    Add-Type -AssemblyName System.Drawing
+    $bmp = New-Object System.Drawing.Bitmap 64,64
+    $g = [System.Drawing.Graphics]::FromImage($bmp)
+    try { $g.Clear([System.Drawing.Color]::FromArgb(255,200,200,200)); $brush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255,120,120,120)); $g.FillRectangle($brush,8,8,48,48); $brush.Dispose(); $letterBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255,255,255,255)); $g.FillRectangle($letterBrush,14,18,4,28); $g.FillRectangle($letterBrush,20,18,10,6); $g.FillRectangle($letterBrush,20,34,10,6); $g.FillRectangle($letterBrush,28,24,4,16); $g.FillRectangle($letterBrush,36,18,4,28); $g.FillRectangle($letterBrush,48,18,4,28); $g.FillRectangle($letterBrush,40,30,8,4); $letterBrush.Dispose(); $bmp.Save($icon,[System.Drawing.Imaging.ImageFormat]::Png) } finally { $g.Dispose(); $bmp.Dispose() }
+}
+
+$zipName = "${($modinfo.name)}_${($modinfo.version)}.zip"
+$zipPath = Join-Path $dist $zipName
+if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+
+$files = @($dll, $pdb, (Join-Path $repoRoot 'modinfo.json'), $icon)
+Compress-Archive -Path $files -DestinationPath $zipPath
+
 if (-not (Test-Path $zipPath)) { throw "Package zip not found at $zipPath" }
-
 Write-Host "Created release zip: $zipPath"
 Write-Host 'Done.'
