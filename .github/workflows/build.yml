@@ -1,0 +1,29 @@
+name: Build DiningHall Mod
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore & Build (Release)
+      run: dotnet build DiningHallMod.csproj -c Release
+
+    - name: Upload DLL
+      uses: actions/upload-artifact@v4
+      with:
+        name: DiningHallMod-dll
+        path: bin/Release/net472/DiningHallMod.dll
