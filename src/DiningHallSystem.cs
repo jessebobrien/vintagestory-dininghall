@@ -1,18 +1,25 @@
 using System;
-using Vintagestory.API.Common;
-using Vintagestory.API.Server;
-using Vintagestory.API.MathTools;
-using Vintagestory.API.Client;
+#if STUBS
+using Common = Vintagestory.API.Common;
+using Server = Vintagestory.API.Common;
+using Math = Vintagestory.API.Common;
+using Client = Vintagestory.API.Common;
+#else
+using Common = Vintagestory.API.Common;
+using Server = Vintagestory.API.Server;
+using Math = Vintagestory.API.MathTools;
+using Client = Vintagestory.API.Client;
+#endif
 using Vintagestory.API.Config;
 
 namespace DiningHallMod
 {
-    public class DiningHallSystem : ModSystem
+    public class DiningHallSystem : Common.ModSystem
     {
-        ICoreServerAPI sapi;
+        Server.ICoreServerAPI sapi;
         private bool wasInHall = false;
 
-        public override void StartServerSide(ICoreServerAPI api)
+        public override void StartServerSide(Server.ICoreServerAPI api)
         {
             sapi = api;
             api.Event.PlayerJoin += OnPlayerJoin;
@@ -20,7 +27,7 @@ namespace DiningHallMod
             api.Logger.Notification("DiningHall mod loaded (server)");
         }
 
-        private void OnPlayerJoin(IServerPlayer byPlayer)
+        private void OnPlayerJoin(Server.IServerPlayer byPlayer)
         {
             // Server-side setup could go here if needed later
         }
@@ -30,7 +37,7 @@ namespace DiningHallMod
         /// Heuristic: search within a box (7x4x7) for a table (adds base value)
         /// and other blocks whose code contains "gold" or "engraving" add extra value.
         /// </summary>
-        public static int CalculateRoomValue(IWorldAccessor world, BlockPos pos)
+        public static int CalculateRoomValue(Common.IWorldAccessor world, Math.BlockPos pos)
         {
             int value = 0;
 
@@ -44,8 +51,8 @@ namespace DiningHallMod
                 {
                     for (int dz = -rangeZ; dz <= rangeZ; dz++)
                     {
-                        BlockPos p = pos.AddCopy(dx, dy, dz);
-                        Block block = world.BlockAccessor.GetBlock(p);
+                        Math.BlockPos p = pos.AddCopy(dx, dy, dz);
+                        Common.Block block = world.BlockAccessor.GetBlock(p);
                         if (block == null) continue;
 
                         string code = block.Code?.ToString() ?? "";
@@ -72,17 +79,17 @@ namespace DiningHallMod
         }
 
         // Client-side: show debug message when player is in a room that contains a table (room value > 0)
-        public override void StartClientSide(ICoreClientAPI api)
+        public override void StartClientSide(Client.ICoreClientAPI api)
         {
             base.StartClientSide(api);
             api.Event.RegisterCallback(dt => ClientTick(api), 1000);
         }
 
-        private void ClientTick(ICoreClientAPI capi)
+        private void ClientTick(Client.ICoreClientAPI capi)
         {
             try
             {
-                BlockPos pos = capi.World.Player.Entity.Pos.AsBlockPos;
+                Math.BlockPos pos = capi.World.Player.Entity.Pos.AsBlockPos;
                 int value = CalculateRoomValue(capi.World, pos);
 
                 bool inHall = value > 0;
