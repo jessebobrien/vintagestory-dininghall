@@ -18,7 +18,7 @@ Scripts you will use
 	- Usage (default):
 
 ```powershell
-.\scripts\make-test-zip-and-install.ps1
+.\scripts\test.ps1
 ```
 
 	- If you want packaging to use your install's API DLLs, pass `-GamePath`:
@@ -78,7 +78,7 @@ Edge cases and checks
 - No-table rooms: ensure zero or low values and no buff application.
 
 Packaging & release
-- Use `scripts\bump-version-and-release.ps1 -Part <patch|minor|major>` to bump the version and produce a release zip in `dist/`.
+ - Use `scripts\release.ps1 -Part <patch|minor|major>` to bump the version and produce a release zip in `dist/`.
 - The script updates `modinfo.json`, builds, and runs packaging. It will print the created zip path when finished.
 
 Troubleshooting

@@ -27,8 +27,8 @@ Copy-Item -Path .\modinfo.json -Destination $mods -Force
 Examples:
 
 ```powershell
-.\scripts\make-test-zip-and-install.ps1
-.\scripts\bump-version-and-release.ps1 -Part patch
+.\scripts\test.ps1
+.\scripts\release.ps1 -Part patch
 ```
 
 Notes
