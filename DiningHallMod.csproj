@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>DiningHallMod</AssemblyName>
+    <RootNamespace>DiningHallMod</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Platforms>x86;x64</Platforms>
+  </PropertyGroup>
+  <!-- Rely on SDK implicit compile items; source files under the project folder will be included automatically -->
+
+  <!-- If you place Vintage Story API DLLs into the `libs` folder, they will be referenced automatically. -->
+  <ItemGroup>
+    <LibDlls Include="libs\**\*.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="@(LibDlls->'%(Filename)')">
+      <HintPath>%(LibDlls.Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
