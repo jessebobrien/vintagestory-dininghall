@@ -72,3 +72,22 @@ If you want to build against the real game DLLs during packaging, pass the `-Gam
 .\package.ps1 -GamePath 'C:\Path\To\VintageStory'
 ```
 
+## Release process (CI)
+
+We have a release job that runs on tag pushes (tags matching `v*`). To create a release:
+
+1. Locally create a signed or lightweight tag for the version you want to release, e.g.:
+
+```powershell
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+2. The GitHub Actions `release` job will run on the tag, execute `package.ps1`, create a GitHub Release, and attach `DiningHall_v0.1.0.zip` to the release.
+
+3. Download the zip from the release and upload it to `mods.vintagestory.at` (or distribute through your preferred channel).
+
+Notes:
+- CI builds with `STUBS` by default so no game DLLs are required in the runner.
+- If you want to build against the real Vintage Story DLLs before releasing, follow the protective branch workflow planned in the CI design tasks.
+
