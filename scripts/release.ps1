@@ -12,7 +12,8 @@ Usage:
 param(
     [ValidateSet('patch','minor','major')]
     [string]$Part = 'patch',
-    [switch]$GamePath
+    [switch]$NoVersionBump,
+    [string]$GamePath = $null
 )
 
 $ErrorActionPreference = 'Stop'
@@ -20,6 +21,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $repoRoot = Resolve-Path (Join-Path $scriptDir '..')
 Set-Location $repoRoot
 
+# Read modinfo and bump version unless -NoVersionBump was specified
 $modinfoPath = Join-Path $repoRoot 'modinfo.json'
 $modinfo = Get-Content $modinfoPath -Raw | ConvertFrom-Json
 
@@ -28,16 +30,20 @@ function Parse-SemVer($s) {
     throw "modinfo.json version '$s' is not semver (MAJOR.MINOR.PATCH)"
 }
 
-$parts = Parse-SemVer $modinfo.version
-switch ($Part) {
-    'patch' { $parts[2]++ }
-    'minor' { $parts[1]++; $parts[2] = 0 }
-    'major' { $parts[0]++; $parts[1] = 0; $parts[2] = 0 }
+if (-not $NoVersionBump) {
+    $parts = Parse-SemVer $modinfo.version
+    switch ($Part) {
+        'patch' { $parts[2]++ }
+        'minor' { $parts[1]++; $parts[2] = 0 }
+        'major' { $parts[0]++; $parts[1] = 0; $parts[2] = 0 }
+    }
+    $newVersion = "$($parts[0]).$($parts[1]).$($parts[2])"
+    $modinfo.version = $newVersion
+    $modinfo | ConvertTo-Json -Depth 4 | Set-Content -NoNewline $modinfoPath -Encoding UTF8
+    Write-Host "Bumped version to $newVersion"
+} else {
+    Write-Host "Skipping version bump (NoVersionBump specified)"
 }
-$newVersion = "$($parts[0]).$($parts[1]).$($parts[2])"
-$modinfo.version = $newVersion
-$modinfo | ConvertTo-Json -Depth 4 | Set-Content -NoNewline $modinfoPath -Encoding UTF8
-Write-Host "Bumped version to $newVersion"
 
 # Build & package
 Write-Host "Building (Release)..."
