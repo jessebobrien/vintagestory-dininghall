@@ -2,6 +2,11 @@
 /bin/
 /obj/
 
+### Distribution and packaging artifacts
+dist/
+modicon.png
+*.deps.json
+
 ### Visual Studio
 /.vs/
 *.user
@@ -19,6 +24,9 @@
 # Also ignore any libs copied into scripts folder during helper runs
 scripts/libs/*.dll
 scripts/libs/*.pdb
+
+# Local helper artifacts
+scripts/libs/
 
 ### OS
 Thumbs.db
