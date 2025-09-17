@@ -48,8 +48,8 @@ if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 $files = @($dll, $pdb, (Join-Path $repoRoot 'modinfo.json'), $icon)
 Compress-Archive -Path $files -DestinationPath $zipPath
 
-# Copy to local Mods folder for testing
-$modsDest = Join-Path $env:APPDATA 'VintagestoryData\Mods\DiningHall'
+# Copy to local Mods folder for testing (place zip directly in Mods, no nested subfolder)
+$modsDest = Join-Path $env:APPDATA 'VintagestoryData\Mods'
 New-Item -ItemType Directory -Force -Path $modsDest | Out-Null
 Copy-Item $zipPath -Destination $modsDest -Force
 Write-Host "Copied $zipName to $modsDest"
