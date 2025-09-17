@@ -1,0 +1,22 @@
+### Build artifacts
+/bin/
+/obj/
+
+### Visual Studio
+/.vs/
+*.user
+*.suo
+
+### Rider
+.idea/
+
+### NuGet
+/packages/
+
+### Vintage Story game DLLs (don't commit these)
+/libs/*.dll
+/libs/*.pdb
+
+### OS
+Thumbs.db
+.DS_Store
