@@ -16,6 +16,9 @@
 ### Vintage Story game DLLs (don't commit these)
 /libs/*.dll
 /libs/*.pdb
+# Also ignore any libs copied into scripts folder during helper runs
+scripts/libs/*.dll
+scripts/libs/*.pdb
 
 ### OS
 Thumbs.db
