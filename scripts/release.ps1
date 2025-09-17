@@ -75,6 +75,7 @@ Write-Host "Created release zip: $zipPath"
 # Copy release zip into user's Mods folder (place zip directly in Mods)
 $modsDest = Join-Path $env:APPDATA 'VintagestoryData\Mods'
 New-Item -ItemType Directory -Force -Path $modsDest | Out-Null
+Get-ChildItem -Path $modsDest -Filter 'DiningHall_*.zip' -File -ErrorAction SilentlyContinue | ForEach-Object { Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue }
 Copy-Item $zipPath -Destination $modsDest -Force
 Write-Host "Copied $zipName to $modsDest"
 Write-Host 'Done.'

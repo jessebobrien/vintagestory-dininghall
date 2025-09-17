@@ -51,6 +51,8 @@ Compress-Archive -Path $files -DestinationPath $zipPath
 # Copy to local Mods folder for testing (place zip directly in Mods, no nested subfolder)
 $modsDest = Join-Path $env:APPDATA 'VintagestoryData\Mods'
 New-Item -ItemType Directory -Force -Path $modsDest | Out-Null
+# Remove any existing DiningHall_*.zip files from the Mods folder before copying
+Get-ChildItem -Path $modsDest -Filter 'DiningHall_*.zip' -File -ErrorAction SilentlyContinue | ForEach-Object { Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue }
 Copy-Item $zipPath -Destination $modsDest -Force
 Write-Host "Copied $zipName to $modsDest"
 Write-Host 'Done.'
