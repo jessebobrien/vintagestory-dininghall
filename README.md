@@ -19,11 +19,16 @@ Copy-Item -Path .\bin\Release\net472\DiningHallMod.dll -Destination $mods -Force
 Copy-Item -Path .\modinfo.json -Destination $mods -Force
 ```
 
-3) Optional: create a packaged zip using the helper script (generates `dist\DiningHall_<version>.zip`):
+3) Optional: use the helper scripts added in `scripts/`:
+
+- `scripts\make-test-zip-and-install.ps1` — builds, packages, and copies the produced zip to your local Mods folder for quick testing.
+- `scripts\bump-version-and-release.ps1` — bump semver in `modinfo.json` (patch/minor/major), build and produce a release zip in `dist/`.
+
+Examples:
 
 ```powershell
-.\package.ps1
-# or: .\package.ps1 -GamePath 'C:\Path\To\VintageStory'
+.\scripts\make-test-zip-and-install.ps1
+.\scripts\bump-version-and-release.ps1 -Part patch
 ```
 
 Notes
@@ -33,5 +38,5 @@ Notes
 Minimal test
 - Start the game after installing the DLL and stand near a table in an enclosed room. Look for chat messages with `[DiningHall DEBUG] Room value: X`.
 
-If you want me to remove all CI workflow files from the repo and push that change, I will do that next (I can also leave the files but disabled). If you'd rather keep them but disabled, tell me and I'll only update the README.
+If you want me to remove other helper scripts and keep only these two, I already removed older helpers; let me know if you want any additional cleanup.
 
