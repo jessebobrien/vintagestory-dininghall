@@ -60,7 +60,10 @@ if (-not (Test-Path $icon)) {
     try { $g.Clear([System.Drawing.Color]::FromArgb(255,200,200,200)); $brush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255,120,120,120)); $g.FillRectangle($brush,8,8,48,48); $brush.Dispose(); $letterBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255,255,255,255)); $g.FillRectangle($letterBrush,14,18,4,28); $g.FillRectangle($letterBrush,20,18,10,6); $g.FillRectangle($letterBrush,20,34,10,6); $g.FillRectangle($letterBrush,28,24,4,16); $g.FillRectangle($letterBrush,36,18,4,28); $g.FillRectangle($letterBrush,48,18,4,28); $g.FillRectangle($letterBrush,40,30,8,4); $letterBrush.Dispose(); $bmp.Save($icon,[System.Drawing.Imaging.ImageFormat]::Png) } finally { $g.Dispose(); $bmp.Dispose() }
 }
 
-$zipName = "${($modinfo.name)}_${($modinfo.version)}.zip"
+$modinfo = Get-Content $modinfoPath -Raw | ConvertFrom-Json
+$name = $modinfo.name
+$version = $modinfo.version
+$zipName = "${name}_${version}.zip"
 $zipPath = Join-Path $dist $zipName
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 
