@@ -37,4 +37,13 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+
+  <!-- Exclude test helper sources from the mod project so they are not compiled into the mod assembly.
+       The SDK-style project includes all .cs files by default; our `tests/` folder contains a separate
+       test project and helper sources which must not be pulled into the mod build. Removing them
+       prevents duplicate assembly attributes and large stub-surface compile errors when STUBS is active. -->
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+    <None Remove="tests\**\*" />
+  </ItemGroup>
 </Project>
