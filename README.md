@@ -39,11 +39,15 @@ Developer notes
 - Local builds can use the real game API DLLs by copying `VintagestoryAPI.dll` and `VintagestoryLib.dll` into `./libs` or by passing `-GamePath` to the scripts.
 - `src/Stubs.cs` and conditional `STUBS` compilation exist for CI-friendly builds that don't require the real DLLs.
 
-Planned work
-- Implement server-side eating-event hook to grant temporary stat buffs when players eat inside a detected dining hall. Buff duration/intensity will scale with room value and player count.
-- Add tests for the detection heuristic and value calculation.
-- Improve detection accuracy and reduce false positives.
+## TODO (upcoming features)
 
-If you'd like the README to include more API details, test cases, or contribution guidelines, tell me what sections to add and I'll expand it.
+- Server eat-event buff — Eating inside a Dining Hall grants a short, temporary stat boost to the player (works on servers).
+- Buff scaling rules — Buff strength and duration scale with how nice the room is and how many players are eating together.
+- Server configuration — Server admins can tune detection, buff strength/duration, and cooldowns via simple config settings.
+- Per-player cooldown — Players can only receive the dining-hall buff occasionally (configurable cooldown to prevent repeats).
+- Better detection — Improve room detection to avoid false positives so normal rooms aren't misidentified as dining halls.
+- Reliability tests — Automated tests to help keep detection and scoring accurate over time.
+- Documentation — Add configuration examples and step-by-step in-game testing instructions for admins and players.
+- Optional: automated builds — Optional CI to produce build artifacts for developers (does not change the manual test/release workflow).
 
 
