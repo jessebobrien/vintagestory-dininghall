@@ -3,5 +3,8 @@
   "FurnishingWeight": 5,
   "RangeX": 3,
   "RangeY": 2,
-  "RangeZ": 3
+  "RangeZ": 3,
+  "SamplingStep": 1,
+  "LightWeight": 2,
+  "MaxRoomValue": 1000
 }

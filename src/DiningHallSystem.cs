@@ -21,6 +21,9 @@ namespace DiningHallMod
         public int RangeX { get; set; } = 3;
         public int RangeY { get; set; } = 2;
         public int RangeZ { get; set; } = 3;
+        public int SamplingStep { get; set; } = 1;
+        public int LightWeight { get; set; } = 2;
+        public int MaxRoomValue { get; set; } = 1000;
     }
 
     public class DiningHallSystem : Common.ModSystem
@@ -82,46 +85,89 @@ namespace DiningHallMod
         /// Heuristic: search within a box (7x4x7) for a table (adds base value)
         /// and other blocks whose code contains "gold" or "engraving" add extra value.
         /// </summary>
+        // Two-stage room value calculation: (1) gather relevant blocks in the scan box; (2) evaluate each block's contribution
         public static int CalculateRoomValue(Common.IWorldAccessor world, Math.BlockPos pos)
         {
-            int rangeX = config.RangeX;
-            int rangeY = config.RangeY;
-            int rangeZ = config.RangeZ;
+            int rx = config.RangeX;
+            int ry = config.RangeY;
+            int rz = config.RangeZ;
+            int step = System.Math.Max(1, config.SamplingStep);
 
-            int tablesFound = 0;
-            int furnishingCount = 0;
+            var blocks = new System.Collections.Generic.List<Common.Block>();
 
-            // First pass: collect counts
-            for (int dx = -rangeX; dx <= rangeX; dx++)
+            for (int dx = -rx; dx <= rx; dx += step)
             {
-                for (int dy = -1; dy <= rangeY; dy++)
+                for (int dy = -1; dy <= ry; dy += step)
                 {
-                    for (int dz = -rangeZ; dz <= rangeZ; dz++)
+                    for (int dz = -rz; dz <= rz; dz += step)
                     {
                         Math.BlockPos p = pos.AddCopy(dx, dy, dz);
                         Common.Block block = world.BlockAccessor.GetBlock(p);
                         if (block == null) continue;
-
-                        string code = block.Code?.ToString() ?? "";
-
-                        if (code.IndexOf("table", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            tablesFound++;
-                        }
-
-                        if (code.IndexOf("gold", StringComparison.OrdinalIgnoreCase) >= 0
-                            || code.IndexOf("engraving", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            furnishingCount++;
-                        }
+                        blocks.Add(block);
                     }
                 }
             }
 
-            if (tablesFound == 0) return 0;
+            // Require at least one table
+            int tableCount = 0;
+            foreach (var b in blocks)
+            {
+                var code = b.Code?.ToString() ?? string.Empty;
+                if (code.IndexOf("table", StringComparison.OrdinalIgnoreCase) >= 0) tableCount++;
+            }
+            if (tableCount == 0) return 0;
 
-            int value = tablesFound * config.TableBaseValue + furnishingCount * config.FurnishingWeight;
-            return value;
+            double total = 0;
+            foreach (var b in blocks)
+            {
+                total += EvaluateBlockValue(b);
+            }
+
+            // Add explicit table base value (tables should be worth more)
+            total += tableCount * config.TableBaseValue;
+
+            // Clamp and return
+            var clamped = (int)System.Math.Round(System.Math.Min(total, config.MaxRoomValue));
+            return clamped;
+        }
+
+        // Evaluates a single block's contribution to room value. Single responsibility: can be extended without touching scan logic.
+        private static double EvaluateBlockValue(Common.Block block)
+        {
+            if (block == null) return 0;
+            string code = block.Code?.ToString() ?? string.Empty;
+
+            double score = 0;
+
+            // Keywords
+            if (code.IndexOf("gold", StringComparison.OrdinalIgnoreCase) >= 0) score += 10;
+            if (code.IndexOf("silver", StringComparison.OrdinalIgnoreCase) >= 0) score += 6;
+            if (code.IndexOf("engraving", StringComparison.OrdinalIgnoreCase) >= 0) score += 8;
+            if (code.IndexOf("chiseled", StringComparison.OrdinalIgnoreCase) >= 0) score += 6;
+
+            // Light proxy: count lamp/torch blocks as contributing to ambience
+            if (code.IndexOf("lamp", StringComparison.OrdinalIgnoreCase) >= 0 || code.IndexOf("torch", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                score += config.LightWeight;
+            }
+
+            // Prefer explicit asset attributes when available: e.g., "diningValue"
+            try
+            {
+                if (block.Attributes != null)
+                {
+                    // Attributes may be a custom AttributesData (stubs) or a JsonObject (runtime).
+                    // Safely convert to string and extract an integer value if present.
+                    var attrText = block.Attributes.ToString();
+                    var rx = new System.Text.RegularExpressions.Regex('"' + "diningValue" + '"' + "\\s*:\\s*(\\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    var m = rx.Match(attrText);
+                    if (m.Success && int.TryParse(m.Groups[1].Value, out var dv)) score += dv;
+                }
+            }
+            catch { /* ignore attribute parsing errors */ }
+
+            return score;
         }
 
         // Client-side: show debug message when player is in a room that contains a table (room value > 0)
