@@ -14,10 +14,37 @@ using Vintagestory.API.Config;
 
 namespace DiningHallMod
 {
+    public class ModConfig
+    {
+        public int TableBaseValue { get; set; } = 10;
+        public int FurnishingWeight { get; set; } = 5;
+        public int RangeX { get; set; } = 3;
+        public int RangeY { get; set; } = 2;
+        public int RangeZ { get; set; } = 3;
+    }
+
     public class DiningHallSystem : Common.ModSystem
     {
         Server.ICoreServerAPI sapi;
         private bool wasInHall = false;
+        private static ModConfig config = new ModConfig();
+
+        static DiningHallSystem()
+        {
+            try
+            {
+                var cfgPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "modconfig.json");
+                if (System.IO.File.Exists(cfgPath))
+                {
+                    var txt = System.IO.File.ReadAllText(cfgPath);
+                    // simple deserialise using JavaScriptSerializer (available on net472)
+                    var ser = new System.Web.Script.Serialization.JavaScriptSerializer();
+                    var parsed = ser.Deserialize<ModConfig>(txt);
+                    if (parsed != null) config = parsed;
+                }
+            }
+            catch { /* fall back to defaults */ }
+        }
 
         public override void StartServerSide(Server.ICoreServerAPI api)
         {
@@ -41,9 +68,9 @@ namespace DiningHallMod
         {
             int value = 0;
 
-            int rangeX = 3;
-            int rangeY = 2;
-            int rangeZ = 3;
+            int rangeX = config.RangeX;
+            int rangeY = config.RangeY;
+            int rangeZ = config.RangeZ;
 
             for (int dx = -rangeX; dx <= rangeX; dx++)
             {
@@ -60,14 +87,14 @@ namespace DiningHallMod
                         // If we find a table-like block, give a base value
                         if (code.IndexOf("table", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            value += 10;
+                            value += config.TableBaseValue;
                         }
 
                         // Furnishings with gold/engraving increase value
                         if (code.IndexOf("gold", StringComparison.OrdinalIgnoreCase) >= 0
                             || code.IndexOf("engraving", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            value += 5;
+                            value += config.FurnishingWeight;
                         }
 
                         // (Deliberately avoid using Attributes helpers here to remain compatible with runtime API types.)
