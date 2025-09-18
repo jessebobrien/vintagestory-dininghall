@@ -1,13 +1,15 @@
-{
-  "name": "DiningHall",
-  "Type": "code",
-  "description": "Adds a Dining Hall room type that grants temporary buffs when eating inside.",
-  "authors": ["jesse"],
-  "version": "0.1.0",
-  "vintagestory": {
-    "apiVersion": "1.0.0"
-  },
-  "entrypoints": {
-    "main": "DiningHallMod.DiningHallSystem"
-  }
+﻿{
+    "name":  "DiningHall",
+    "Type":  "code",
+    "description":  "Adds a Dining Hall room type that grants temporary buffs when eating inside.",
+    "authors":  [
+                    "Karch"
+                ],
+    "version":  "0.0.1",
+    "vintagestory":  {
+                         "apiVersion":  "1.0.0"
+                     },
+    "entrypoints":  {
+                        "main":  "DiningHallMod.DiningHallSystem"
+                    }
 }

@@ -1,0 +1,14 @@
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\bin\Release\net472\TestRunner.exe.config
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\bin\Release\net472\TestRunner.exe
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\bin\Release\net472\TestRunner.pdb
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\bin\Release\net472\DiningHallMod.dll
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\bin\Release\net472\DiningHallMod.pdb
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.csproj.AssemblyReference.cache
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.AssemblyInfoInputs.cache
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.AssemblyInfo.cs
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.csproj.CoreCompileInputs.cache
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.sourcelink.json
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.csproj.Up2Date
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.exe
+C:\Users\jesse\Documents\dev\vintagestory_dininghall\tests\obj\Release\net472\TestRunner.pdb

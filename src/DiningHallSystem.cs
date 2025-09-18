@@ -37,10 +37,26 @@ namespace DiningHallMod
                 if (System.IO.File.Exists(cfgPath))
                 {
                     var txt = System.IO.File.ReadAllText(cfgPath);
-                    // simple deserialise using JavaScriptSerializer (available on net472)
-                    var ser = new System.Web.Script.Serialization.JavaScriptSerializer();
-                    var parsed = ser.Deserialize<ModConfig>(txt);
-                    if (parsed != null) config = parsed;
+                    // Lightweight parser: extract integer properties by name. This avoids needing
+                    // System.Web.Script.Serialization or external JSON libraries in test builds.
+                    int ParseInt(string key, int fallback)
+                    {
+                        try
+                        {
+                            var pattern = "\"" + key + "\"\\s*:\\s*(\\d+)";
+                            var rx = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                            var m = rx.Match(txt);
+                            if (m.Success && int.TryParse(m.Groups[1].Value, out var v)) return v;
+                        }
+                        catch { }
+                        return fallback;
+                    }
+
+                    config.TableBaseValue = ParseInt(nameof(ModConfig.TableBaseValue), config.TableBaseValue);
+                    config.FurnishingWeight = ParseInt(nameof(ModConfig.FurnishingWeight), config.FurnishingWeight);
+                    config.RangeX = ParseInt(nameof(ModConfig.RangeX), config.RangeX);
+                    config.RangeY = ParseInt(nameof(ModConfig.RangeY), config.RangeY);
+                    config.RangeZ = ParseInt(nameof(ModConfig.RangeZ), config.RangeZ);
                 }
             }
             catch { /* fall back to defaults */ }
@@ -54,6 +70,8 @@ namespace DiningHallMod
             api.Logger.Notification("DiningHall mod loaded (server)");
         }
 
+        // ...existing code...
+
         private void OnPlayerJoin(Server.IServerPlayer byPlayer)
         {
             // Server-side setup could go here if needed later
@@ -66,12 +84,14 @@ namespace DiningHallMod
         /// </summary>
         public static int CalculateRoomValue(Common.IWorldAccessor world, Math.BlockPos pos)
         {
-            int value = 0;
-
             int rangeX = config.RangeX;
             int rangeY = config.RangeY;
             int rangeZ = config.RangeZ;
 
+            int tablesFound = 0;
+            int furnishingCount = 0;
+
+            // First pass: collect counts
             for (int dx = -rangeX; dx <= rangeX; dx++)
             {
                 for (int dy = -1; dy <= rangeY; dy++)
@@ -84,24 +104,23 @@ namespace DiningHallMod
 
                         string code = block.Code?.ToString() ?? "";
 
-                        // If we find a table-like block, give a base value
                         if (code.IndexOf("table", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            value += config.TableBaseValue;
+                            tablesFound++;
                         }
 
-                        // Furnishings with gold/engraving increase value
                         if (code.IndexOf("gold", StringComparison.OrdinalIgnoreCase) >= 0
                             || code.IndexOf("engraving", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            value += config.FurnishingWeight;
+                            furnishingCount++;
                         }
-
-                        // (Deliberately avoid using Attributes helpers here to remain compatible with runtime API types.)
                     }
                 }
             }
 
+            if (tablesFound == 0) return 0;
+
+            int value = tablesFound * config.TableBaseValue + furnishingCount * config.FurnishingWeight;
             return value;
         }
 

@@ -7,14 +7,31 @@
     <LangVersion>latest</LangVersion>
     <Platforms>x86;x64</Platforms>
   </PropertyGroup>
+  <!-- When the Vintage Story API DLLs are not present in libs/, compile with STUBS to use the in-repo stubs. -->
+  <!-- Use stubs automatically when the real DLL isn't present, or when a build explicitly sets ForceUseStubs=true. -->
+  <PropertyGroup>
+    <!-- Normal default; empty unless overridden -->
+    <ForceUseStubs Condition=" '$(ForceUseStubs)' == '' ">false</ForceUseStubs>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Determine whether to use stubs: true if forced, or if the libs dll doesn't exist -->
+    <UseStubs Condition=" '$(ForceUseStubs)' == 'true' ">true</UseStubs>
+    <UseStubs Condition=" '$(UseStubs)' == '' and !Exists('libs\\VintagestoryAPI.dll') ">true</UseStubs>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(UseStubs)' == 'true' ">
+    <DefineConstants>STUBS</DefineConstants>
+  </PropertyGroup>
   <!-- Rely on SDK implicit compile items; source files under the project folder will be included automatically -->
 
   <!-- If you place Vintage Story API DLLs into the `libs` folder, they will be referenced automatically. -->
-  <ItemGroup>
+  <!-- Only reference real Vintage Story DLLs when not building with STUBS -->
+  <ItemGroup Condition=" '$(UseStubs)' != 'true' ">
     <LibDlls Include="libs\**\*.dll" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(UseStubs)' != 'true' ">
     <Reference Include="@(LibDlls->'%(Filename)')">
       <HintPath>%(LibDlls.Identity)</HintPath>
       <Private>False</Private>
