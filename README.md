@@ -1,43 +1,49 @@
-# Vintage Story Dining Hall Mod — Local Build Only
+# Dining Hall (Vintage Story mod)
 
-This repo contains a small Vintage Story mod that detects a Dining Hall room and displays a debug value when a player enters it. To keep things simple we now focus on local builds only (no CI workflows).
+Short description
+This mod detects when players are inside a Dining Hall (a small, enclosed room containing a table) and computes a simple "room value" based on nearby furnishings. The current prototype shows client-side debug messages when entering or leaving a detected dining hall.
 
-Quick local build and package (Windows, PowerShell)
+Current status
+- Detection heuristic and client debug display: implemented (prototype).
+- Build/packaging helpers: `scripts/test.ps1` (build/package without bump) and `scripts/release.ps1` (release packaging with optional bump).
+- Server-side buff-on-eat: planned (not implemented).
 
-1) Build the mod (Release):
+Quick start (Windows, PowerShell)
+1) Quick test (build, package, install to local Mods):
 
 ```powershell
-dotnet build .\DiningHallMod.csproj -c Release
+.\scripts\test.ps1 -GamePath 'C:\Users\jesse\AppData\Roaming\Vintagestory'
 ```
 
-2) Install for testing (copy to your Mods folder):
+This will build the mod, create `dist/DiningHall_<version>.zip`, and copy the zip directly into `%APPDATA%\VintagestoryData\Mods` for testing.
+
+2) Release package (bump version and create release zip):
 
 ```powershell
-$mods = Join-Path $env:APPDATA 'VintagestoryData\Mods\DiningHall'
-New-Item -ItemType Directory -Force -Path $mods | Out-Null
-Copy-Item -Path .\bin\Release\net472\DiningHallMod.dll -Destination $mods -Force
-Copy-Item -Path .\modinfo.json -Destination $mods -Force
-```
-
-3) Optional: use the helper scripts added in `scripts/`:
-
-- `scripts\test.ps1` — builds, packages, and copies the produced zip to your local Mods folder for quick testing.
-- `scripts\release.ps1` — bump semver in `modinfo.json` (patch/minor/major), build and produce a release zip in `dist/`.
-
-Examples:
-
-```powershell
-.\scripts\test.ps1
 .\scripts\release.ps1 -Part patch
 ```
 
-Notes
-- The project targets `net472` by default. Vintage Story uses .NET Framework — if your environment differs, update the target framework in `DiningHallMod.csproj`.
-- STUBS builds and the `STUBS` symbol exist for CI-friendly builds; since we're not using CI, you can build against your local game DLLs by copying them into `./libs` or passing `-GamePath` to `package.ps1`.
+By default `release.ps1` bumps `modinfo.json`. To package without changing `modinfo.json`, pass `-NoVersionBump`:
 
-Minimal test
-- Start the game after installing the DLL and stand near a table in an enclosed room. Look for chat messages with `[DiningHall DEBUG] Room value: X`.
+```powershell
+.\scripts\release.ps1 -NoVersionBump -GamePath 'C:\Users\jesse\AppData\Roaming\Vintagestory'
+```
 
-If you want me to remove other helper scripts and keep only these two, I already removed older helpers; let me know if you want any additional cleanup.
+Testing notes
+- In game, make a small enclosed room and place a table block inside. Enter the room and look for chat messages:
+	- `[DiningHall] Entered dining area — value: X`
+	- `[DiningHall DEBUG] Room value: X`
+
+Developer notes
+- The project targets `net472` to match Vintage Story's runtime.
+- Local builds can use the real game API DLLs by copying `VintagestoryAPI.dll` and `VintagestoryLib.dll` into `./libs` or by passing `-GamePath` to the scripts.
+- `src/Stubs.cs` and conditional `STUBS` compilation exist for CI-friendly builds that don't require the real DLLs.
+
+Planned work
+- Implement server-side eating-event hook to grant temporary stat buffs when players eat inside a detected dining hall. Buff duration/intensity will scale with room value and player count.
+- Add tests for the detection heuristic and value calculation.
+- Improve detection accuracy and reduce false positives.
+
+If you'd like the README to include more API details, test cases, or contribution guidelines, tell me what sections to add and I'll expand it.
 
 
