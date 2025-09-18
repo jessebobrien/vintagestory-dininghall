@@ -41,6 +41,7 @@ Developer notes
 
 ## TODO (upcoming features)
 
+- Room value calculation — Compute a numeric value for a Dining Hall based on tables and furnishings (used to scale buffs).
 - Server eat-event buff — Eating inside a Dining Hall grants a short, temporary stat boost to the player (works on servers).
 - Buff scaling rules — Buff strength and duration scale with how nice the room is and how many players are eating together.
 - Server configuration — Server admins can tune detection, buff strength/duration, and cooldowns via simple config settings.
